@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_menu"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/fragmentListProduk"
+        android:name="com.example.tugas_proyek2.fragments.FragmentListProduk"
+        android:label="Semua Produk"
+        tools:layout="@layout/fragment_list_produk" >
+        <action
+            android:id="@+id/action_fragmentListProduk_to_fragmentDetailProduk"
+            app:destination="@id/fragmentDetailProduk" />
+        <action
+            android:id="@+id/action_fragmentListProduk_to_fragmentFormProduk"
+            app:destination="@id/fragmentFormProduk" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentCashier"
+        android:name="com.example.tugas_proyek2.fragments.FragmentCashier"
+        android:label="PoS Cashier"
+        tools:layout="@layout/fragment_cashier" >
+        <action
+            android:id="@+id/action_fragmentCashier_to_cartFragment"
+            app:destination="@id/cartFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cartFragment"
+        android:name="com.example.tugas_proyek2.fragments.CartFragment"
+        android:label="Cart"
+        tools:layout="@layout/fragment_cart" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.tugas_proyek2.fragments.SettingsPageFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings_page" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.tugas_proyek2.fragments.HomeFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_fragmentCashier"
+            app:destination="@id/fragmentCashier" />
+        <action
+            android:id="@+id/action_homeFragment_to_inventoryFragment"
+            app:destination="@id/inventoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/inventoryFragment"
+        android:name="com.example.tugas_proyek2.fragments.InventoryFragment"
+        android:label="Inventory"
+        tools:layout="@layout/fragment_inventory" >
+        <action
+            android:id="@+id/action_inventoryFragment_to_fragmentListProduk"
+            app:destination="@id/fragmentListProduk" />
+        <action
+            android:id="@+id/action_inventoryFragment_to_fragmentListDistributor"
+            app:destination="@id/fragmentListDistributor" />
+        <action
+            android:id="@+id/action_inventoryFragment_to_fragmentKategori"
+            app:destination="@id/fragmentKategori" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentListDistributor"
+        android:name="com.example.tugas_proyek2.fragments.FragmentListDistributor"
+        android:label="Distributor" >
+        <action
+            android:id="@+id/action_fragmentListDistributor_to_fragmentDetailDistributor"
+            app:destination="@id/fragmentDetailDistributor" />
+        <action
+            android:id="@+id/action_fragmentListDistributor_to_fragmentFormDistributor"
+            app:destination="@id/fragmentFormDistributor" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentKategori"
+        android:name="com.example.tugas_proyek2.fragments.FragmentListKategori"
+        android:label="Kategori" >
+        <action
+            android:id="@+id/action_fragmentListKategori_to_fragmentDetailKategori"
+            app:destination="@id/fragmentDetailKategori" />
+        <action
+            android:id="@+id/action_fragmentListKategori_to_fragmentFormKategori3"
+            app:destination="@id/fragmentFormKategori3" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentDetailProduk"
+        android:name="com.example.tugas_proyek2.fragments.FragmentDetailProduk"
+        android:label="Detail Produk"
+        tools:layout="@layout/fragment_detail_produk" />
+    <fragment
+        android:id="@+id/fragmentDetailDistributor"
+        android:name="com.example.tugas_proyek2.fragments.FragmentDetailDistributor"
+        android:label="Detail Distributor"
+        tools:layout="@layout/fragment_detail_distributor" />
+    <fragment
+        android:id="@+id/fragmentDetailKategori"
+        android:name="com.example.tugas_proyek2.fragments.FragmentDetailKategori"
+        android:label="Detail Kategori"
+        tools:layout="@layout/fragment_detail_kategori" />
+    <fragment
+        android:id="@+id/fragmentFormProduk"
+        android:name="com.example.tugas_proyek2.fragments.FragmentFormProduk"
+        android:label="Tambah Produk"
+        tools:layout="@layout/fragment_form_produk" />
+    <fragment
+        android:id="@+id/fragmentFormDistributor"
+        android:name="com.example.tugas_proyek2.fragments.FragmentFormDistributor"
+        android:label="Tambah Distributor"
+        tools:layout="@layout/fragment_form_distributor" />
+    <fragment
+        android:id="@+id/fragmentFormKategori3"
+        android:name="com.example.tugas_proyek2.fragments.FragmentFormKategori"
+        android:label="Tambah Kategori"
+        tools:layout="@layout/fragment_form_kategori" />
+</navigation>
