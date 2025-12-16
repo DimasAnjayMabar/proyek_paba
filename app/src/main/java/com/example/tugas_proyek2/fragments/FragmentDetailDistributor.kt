@@ -1,6 +1,8 @@
 package com.example.tugas_proyek2.fragments
 
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -39,6 +41,7 @@ class FragmentDetailDistributor : Fragment() {
     private lateinit var etEmail: EditText
     private lateinit var btnUpdate: Button
     private lateinit var btnDelete: Button
+    private lateinit var btnContact: Button // Tambahkan deklarasi tombol hubungi
 
     private val distributorService = DistributorService()
 
@@ -123,6 +126,10 @@ class FragmentDetailDistributor : Fragment() {
         btnDelete.setOnClickListener {
             deleteDistributor()
         }
+
+        btnContact.setOnClickListener {
+            contactDistributor()
+        }
     }
 
     private fun initViews(view: View){
@@ -130,6 +137,7 @@ class FragmentDetailDistributor : Fragment() {
         etEmail = view.findViewById(R.id.et_email_distributor)
         btnUpdate = view.findViewById(R.id.btn_update_distributor)
         btnDelete = view.findViewById(R.id.btn_delete_distributor)
+        btnContact = view.findViewById(R.id.btn_contact_distributor) // Inisialisasi tombol hubungi
     }
 
     private fun updateDistributor(){
@@ -330,5 +338,151 @@ class FragmentDetailDistributor : Fragment() {
     private fun populateData(distributor: DcDistributor){
         etNama.setText(distributor.nama)
         etEmail.setText(distributor.email)
+    }
+
+    // Fungsi untuk menghubungi distributor via email
+    private fun contactDistributor() {
+        val email = etEmail.text.toString().trim()
+
+        // Validasi apakah email sudah diisi
+        if (email.isEmpty()) {
+            Toast.makeText(
+                requireContext(),
+                "Email distributor belum diisi",
+                Toast.LENGTH_SHORT
+            ).show()
+            etEmail.requestFocus()
+            return
+        }
+
+        // Validasi format email sederhana
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(
+                requireContext(),
+                "Format email tidak valid",
+                Toast.LENGTH_SHORT
+            ).show()
+            etEmail.requestFocus()
+            return
+        }
+
+        try {
+            // Coba metode pertama: ACTION_SENDTO dengan mailto URI
+            val mailtoUri = Uri.parse("mailto:$email")
+            val intent = Intent(Intent.ACTION_SENDTO, mailtoUri).apply {
+                putExtra(Intent.EXTRA_SUBJECT, "Pertanyaan untuk Distributor")
+
+                val namaDistributor = etNama.text.toString().trim()
+                val body = if (namaDistributor.isNotEmpty()) {
+                    "Kepada Yth. $namaDistributor,\n\n"
+                } else {
+                    "Kepada Yth. Distributor,\n\n"
+                }
+
+                putExtra(Intent.EXTRA_TEXT, body)
+
+                // Tambahkan flags
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            // Cek apakah ada aplikasi yang dapat menangani intent ini
+            Log.d("FragmentDetailDistributor", "Checking for email apps...")
+
+            val packageManager = requireActivity().packageManager
+            val activities = packageManager.queryIntentActivities(intent, 0)
+
+            Log.d("FragmentDetailDistributor", "Found ${activities.size} activities that can handle mailto")
+
+            if (activities.isNotEmpty()) {
+                // Tampilkan chooser untuk memilih aplikasi
+                startActivity(Intent.createChooser(intent, "Pilih aplikasi email"))
+                Log.d("FragmentDetailDistributor", "Email chooser launched")
+            } else {
+                // Coba metode kedua: ACTION_SEND dengan tipe MIME
+                Log.d("FragmentDetailDistributor", "No apps for mailto, trying ACTION_SEND")
+                fallbackToActionSend(email)
+            }
+
+        } catch (e: Exception) {
+            Log.e("FragmentDetailDistributor", "Error opening email app: ${e.message}", e)
+            Toast.makeText(
+                requireContext(),
+                "Terjadi kesalahan: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    // Metode fallback menggunakan ACTION_SEND
+    private fun fallbackToActionSend(email: String) {
+        try {
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "message/rfc822"  // MIME type untuk email
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                putExtra(Intent.EXTRA_SUBJECT, "Pertanyaan untuk Distributor")
+
+                val namaDistributor = etNama.text.toString().trim()
+                val body = if (namaDistributor.isNotEmpty()) {
+                    "Kepada Yth. $namaDistributor,\n\n"
+                } else {
+                    "Kepada Yth. Distributor,\n\n"
+                }
+
+                putExtra(Intent.EXTRA_TEXT, body)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            val packageManager = requireActivity().packageManager
+            val activities = packageManager.queryIntentActivities(intent, 0)
+
+            Log.d("FragmentDetailDistributor", "Found ${activities.size} activities that can handle ACTION_SEND")
+
+            if (activities.isNotEmpty()) {
+                startActivity(Intent.createChooser(intent, "Pilih aplikasi email"))
+            } else {
+                // Jika masih tidak ada, tampilkan dialog alternatif
+                showNoEmailAppDialog(email)
+            }
+
+        } catch (e: Exception) {
+            Log.e("FragmentDetailDistributor", "Error in fallback: ${e.message}", e)
+            showNoEmailAppDialog(email)
+        }
+    }
+
+    // Perbaiki dialog alternatif
+    private fun showNoEmailAppDialog(email: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Tidak Dapat Membuka Email")
+            .setMessage("Tidak ditemukan aplikasi email yang kompatibel.\n\nEmail distributor: $email")
+            .setPositiveButton("Salin Email") { dialog, which ->
+                // Salin email ke clipboard
+                val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                        as android.content.ClipboardManager
+                val clip = android.content.ClipData.newPlainText("Email Distributor", email)
+                clipboard.setPrimaryClip(clip)
+
+                Toast.makeText(
+                    requireContext(),
+                    "✓ Email disalin ke clipboard",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton("Buka Gmail Web") { dialog, which ->
+                // Alternatif: Buka Gmail di browser dengan compose
+                try {
+                    val url = "https://mail.google.com/mail/?view=cm&fs=1&to=$email&su=Pertanyaan untuk Distributor"
+                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    startActivity(browserIntent)
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Tidak dapat membuka browser",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .setNeutralButton("OK", null)
+            .show()
     }
 }
