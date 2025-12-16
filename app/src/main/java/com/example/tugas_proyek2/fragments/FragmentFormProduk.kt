@@ -323,21 +323,27 @@ class FragmentFormProduk : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 btnAdd.isEnabled = false
-                btnAdd.text = "Menambahkan..."
+                btnAdd.text = "Memproses..."
 
                 // Validasi pilihan dropdown
                 if (selectedKategoriId == null) {
                     Toast.makeText(requireContext(), "Pilih kategori terlebih dahulu", Toast.LENGTH_SHORT).show()
-                    btnAdd.isEnabled = true
-                    btnAdd.text = "Add"
+                    resetAddButton()
                     return@launch
                 }
 
                 if (selectedDistributorId == null) {
                     Toast.makeText(requireContext(), "Pilih distributor terlebih dahulu", Toast.LENGTH_SHORT).show()
-                    btnAdd.isEnabled = true
-                    btnAdd.text = "Add"
+                    resetAddButton()
                     return@launch
+                }
+
+                // Ambil nama produk untuk pengecekan
+                val namaProduk = etNama.text.toString().trim()
+
+                // Cek apakah produk dengan nama yang sama sudah ada
+                val existingProductInfo = withContext(Dispatchers.IO) {
+                    getExistingProductInfo(namaProduk)
                 }
 
                 // Jika ada gambar, upload ke Cloudinary
@@ -347,9 +353,9 @@ class FragmentFormProduk : Fragment() {
                     ""
                 }
 
-                // Buat objek DcProduk
+                // Buat objek DcProduk dengan data baru
                 val newProduk = DcProduk(
-                    nama = etNama.text.toString(),
+                    nama = namaProduk,
                     harga_beli = etHargaBeli.text.toString().toLongOrNull(),
                     persentase_keuntungan = etPersentaseKeuntungan.text.toString().toDoubleOrNull(),
                     harga_jual = parseHargaJualFromText(),
@@ -360,24 +366,146 @@ class FragmentFormProduk : Fragment() {
                     image = imageUrl
                 )
 
-                // Tambah ke database
-                val productId = produkService.addProduct(newProduk)
-
-                if (productId != null) {
-                    Snackbar.make(requireView(), "Produk berhasil ditambahkan", Snackbar.LENGTH_SHORT).show()
-                    clearForm()
+                if (existingProductInfo != null) {
+                    // Produk sudah ada, tampilkan dialog konfirmasi update
+                    showUpdateConfirmationDialog(existingProductInfo, newProduk)
                 } else {
-                    Toast.makeText(requireContext(), "Gagal menambahkan produk", Toast.LENGTH_SHORT).show()
+                    // Produk belum ada, tambah produk baru
+                    addNewProductToDatabase(newProduk)
                 }
 
             } catch (e: Exception) {
                 Log.e("FragmentFormProduk", "Error adding new product", e)
-                Toast.makeText(requireContext(), "Gagal menambahkan produk: ${e.message}", Toast.LENGTH_SHORT).show()
-            } finally {
-                btnAdd.isEnabled = true
-                btnAdd.text = "Add"
+                Toast.makeText(requireContext(), "Gagal memproses produk: ${e.message}", Toast.LENGTH_SHORT).show()
+                resetAddButton()
             }
         }
+    }
+
+    private suspend fun getExistingProductInfo(namaProduk: String): Pair<String, DcProduk>? {
+        return try {
+            // Ambil semua produk dengan ID
+            val allProductsWithIds = produkService.getAllProductsWithIds()
+
+            // Cari produk dengan nama yang sama (case-insensitive)
+            val existingEntry = allProductsWithIds.entries.firstOrNull {
+                it.value.nama?.trim()?.equals(namaProduk, ignoreCase = true) == true
+            }
+
+            existingEntry?.let { Pair(it.key, it.value) }
+        } catch (e: Exception) {
+            Log.e("FragmentFormProduk", "Error checking product existence", e)
+            null
+        }
+    }
+
+    private fun showUpdateConfirmationDialog(existingProductInfo: Pair<String, DcProduk>, newProductData: DcProduk) {
+        val (productId, existingProduct) = existingProductInfo
+
+        // Hitung stok baru (stok lama + stok baru)
+        val stokLama = existingProduct.stok ?: 0L
+        val stokBaru = newProductData.stok ?: 0L
+        val totalStok = stokLama + stokBaru
+
+        // Buat dialog konfirmasi
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Produk Sudah Ada")
+            .setMessage("""
+            Produk "${existingProduct.nama}" sudah ada di database.
+            
+            Data saat ini:
+            • Harga Beli: Rp${existingProduct.harga_beli}
+            • Harga Jual: Rp${existingProduct.harga_jual}
+            • Stok: ${existingProduct.stok}
+            
+            Data baru yang akan diupdate:
+            • Harga Beli: Rp${newProductData.harga_beli}
+            • Harga Jual: Rp${newProductData.harga_jual}
+            • Stok: ${totalStok} (${existingProduct.stok} + ${newProductData.stok})
+            • Kategori: Akan diupdate
+            • Distributor: Akan diupdate
+            
+            Apakah Anda ingin mengupdate produk ini dengan data baru?
+        """.trimIndent())
+            .setPositiveButton("Ya, Update") { dialog, _ ->
+                dialog.dismiss()
+                CoroutineScope(Dispatchers.Main).launch {
+                    updateExistingProduct(productId, existingProduct, newProductData)
+                }
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+                resetAddButton()
+            }
+            .setNeutralButton("Tambah sebagai Produk Baru") { dialog, _ ->
+                dialog.dismiss()
+                CoroutineScope(Dispatchers.Main).launch {
+                    // Tambah produk baru dengan nama yang berbeda
+                    addNewProductToDatabase(newProductData.copy(
+                        nama = "${newProductData.nama} (2)" // Tambah penanda
+                    ))
+                }
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private suspend fun updateExistingProduct(productId: String, existingProduct: DcProduk, newProductData: DcProduk) {
+        try {
+            // Update semua field dengan data baru
+            val updatedProduct = DcProduk(
+                nama = newProductData.nama, // Nama tetap sama
+                harga_beli = newProductData.harga_beli,
+                persentase_keuntungan = newProductData.persentase_keuntungan,
+                harga_jual = newProductData.harga_jual,
+                // Tambah stok baru ke stok lama
+                stok = (existingProduct.stok ?: 0L) + (newProductData.stok ?: 0L),
+                kategori_id = newProductData.kategori_id,
+                distributor_id = newProductData.distributor_id,
+                // Update tanggal ke tanggal terbaru
+                tanggal = newProductData.tanggal,
+                // Gunakan gambar baru jika ada, jika tidak gunakan gambar lama
+                image = newProductData.image!!.ifEmpty { existingProduct.image ?: "" }
+            )
+
+            val success = produkService.updateProduct(productId, updatedProduct)
+
+            if (success) {
+                Snackbar.make(requireView(), "Produk berhasil diupdate", Snackbar.LENGTH_SHORT).show()
+                clearForm()
+            } else {
+                Toast.makeText(requireContext(), "Gagal mengupdate produk", Toast.LENGTH_SHORT).show()
+            }
+
+        } catch (e: Exception) {
+            Log.e("FragmentFormProduk", "Error updating existing product", e)
+            Toast.makeText(requireContext(), "Gagal mengupdate produk: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            resetAddButton()
+        }
+    }
+
+    private suspend fun addNewProductToDatabase(product: DcProduk) {
+        try {
+            val productId = produkService.addProduct(product)
+
+            if (productId != null) {
+                Snackbar.make(requireView(), "Produk baru berhasil ditambahkan", Snackbar.LENGTH_SHORT).show()
+                clearForm()
+            } else {
+                Toast.makeText(requireContext(), "Gagal menambahkan produk", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            Log.e("FragmentFormProduk", "Error adding new product to database", e)
+            Toast.makeText(requireContext(), "Gagal menambahkan produk: ${e.message}", Toast.LENGTH_SHORT).show()
+        } finally {
+            resetAddButton()
+        }
+    }
+
+    private fun resetAddButton() {
+        btnAdd.isEnabled = true
+        btnAdd.text = "Add"
     }
 
     private suspend fun uploadImageToCloudinary(uri: Uri): String = suspendCoroutine { continuation ->

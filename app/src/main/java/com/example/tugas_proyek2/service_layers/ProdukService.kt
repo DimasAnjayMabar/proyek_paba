@@ -5,6 +5,7 @@ import com.example.tugas_proyek2.data_class.DcProduk
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
+import java.util.Locale
 
 class ProdukService {
     private val db = Firebase.firestore
@@ -95,6 +96,36 @@ class ProdukService {
             doc.exists()
         } catch (e: Exception) {
             false
+        }
+    }
+
+    // READ: Get product by name (case-insensitive)
+    suspend fun getProductByName(name: String): DcProduk? {
+        return try {
+            val snapshot = db.collection("produk")
+                .whereEqualTo("nama", name)
+                .get()
+                .await()
+
+            snapshot.documents.firstOrNull()?.toObject(DcProduk::class.java)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting product by name: ${e.message}", e)
+            null
+        }
+    }
+
+    // READ: Search products by name (partial match, case-insensitive)
+    suspend fun searchProductsByName(name: String): List<DcProduk> {
+        return try {
+            val allProducts = getAllProducts()
+            val searchTerm = name.lowercase(Locale.getDefault())
+
+            allProducts.filter {
+                it.nama?.lowercase(Locale.getDefault())?.contains(searchTerm) == true
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error searching products by name: ${e.message}", e)
+            emptyList()
         }
     }
 

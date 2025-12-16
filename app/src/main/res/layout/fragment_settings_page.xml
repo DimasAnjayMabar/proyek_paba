@@ -1,19 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.SettingsPageFragment"
-    android:background="#F98FF0">
+    android:background="#F5F5F5">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Settings Fragment"
-        android:gravity="center"
-        android:textSize="40sp"
-        android:textStyle="bold"/>
+        android:padding="16dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pengaturan"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Card untuk Stok Minimal -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMinStock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FFFFFF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Atur Stok Minimal"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#333333" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Setel batas stok minimal untuk mendapatkan notifikasi"
+                        android:textSize="14sp"
+                        android:textColor="#666666"
+                        android:layout_marginTop="4dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvCurrentMinStock"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Stok minimal saat ini: 10"
+                            android:textSize="16sp"
+                            android:textColor="#2196F3" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_edit"
+                            app:tint="#666666" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Informasi tambahan -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fitur notifikasi akan diaktifkan setelah stok mencapai batas minimal yang ditetapkan."
+                android:textSize="12sp"
+                android:textColor="#888888"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="4dp"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>
