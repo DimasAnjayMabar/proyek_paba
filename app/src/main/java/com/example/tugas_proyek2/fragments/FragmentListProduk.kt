@@ -1,5 +1,6 @@
 package com.example.tugas_proyek2.fragments
 
+import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -10,6 +11,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.Button
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -23,9 +28,12 @@ import com.example.tugas_proyek2.adapters.ProductAdapter
 import com.example.tugas_proyek2.data_class.DcProduk
 import com.example.tugas_proyek2.databinding.FragmentListProdukBinding
 import com.example.tugas_proyek2.misc.GridSpacingItemDecoration
+import com.example.tugas_proyek2.service_layers.DistributorService
+import com.example.tugas_proyek2.service_layers.KategoriService
 import com.example.tugas_proyek2.services.ProdukService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,9 +61,20 @@ class FragmentListProduk : Fragment() {
     // Map untuk menyimpan hubungan antara produk dan document ID
     private val productIdMap = mutableMapOf<DcProduk, String>() // Key: objek produk, Value: document ID
 
-    // Notification
-    private val CHANNEL_ID = "low_stock_channel"
-    private val NOTIFICATION_ID = 1001
+    private lateinit var btnFilterProduk: AppCompatImageButton
+    private val kategoriService = KategoriService()
+    private val distributorService = DistributorService()
+
+    private var selectedKategoriId: String? = null
+    private var selectedDistributorId: String? = null
+    private var hargaMin: Long? = null
+    private var hargaMax: Long? = null
+
+    private val kategoriMap = mutableMapOf<String, String>() // Nama kategori -> ID
+    private val distributorMap = mutableMapOf<String, String>() // Nama distributor -> ID
+
+    private val kategoriList = mutableListOf<String>()
+    private val distributorList = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,9 +86,6 @@ class FragmentListProduk : Fragment() {
         // Inisialisasi SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-//        // Buat notification channel (untuk Android Oreo ke atas)
-//        createNotificationChannel()
-
         return binding.root
     }
 
@@ -80,83 +96,210 @@ class FragmentListProduk : Fragment() {
         setupSearchBar()
         setupSwipeRefresh()
         setupFAB()
+        setupFilterButton()
         loadProductsFromFirestore(showProgressBar = true)
     }
 
-//    private fun createNotificationChannel() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val name = "Stok Rendah Notification"
-//            val descriptionText = "Notifikasi untuk produk dengan stok rendah"
-//            val importance = NotificationManager.IMPORTANCE_DEFAULT
-//            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-//                description = descriptionText
-//            }
-//
-//            val notificationManager = requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//            notificationManager.createNotificationChannel(channel)
-//        }
-//    }
-//
-//    private fun checkLowStockProducts(products: List<DcProduk>) {
-//        // Ambil nilai stok minimal dari SharedPreferences
-//        val minStock = sharedPreferences.getInt(KEY_MIN_STOCK, DEFAULT_MIN_STOCK)
-//
-//        // Filter produk dengan stok rendah
-//        val lowStockProducts = products.filter { produk ->
-//            produk.stok != null && produk.stok!! <= minStock
-//        }
-//
-//        // Jika ada produk dengan stok rendah, tampilkan notifikasi
-//        if (lowStockProducts.isNotEmpty()) {
-//            showLowStockNotification(lowStockProducts, minStock)
-//        }
-//    }
-//
-//    private fun showLowStockNotification(lowStockProducts: List<DcProduk>, minStock: Int) {
-//        val context = requireContext()
-//
-//        // Cek apakah izin notifikasi sudah diberikan (untuk Android 13/Tiramisu ke atas)
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            val notificationManager = NotificationManagerCompat.from(context)
-//            if (!notificationManager.areNotificationsEnabled()) {
-//                Log.d("FragmentListProduk", "Notifications are disabled")
-//                showSnackbar("Notifikasi dinonaktifkan. Aktifkan untuk menerima peringatan stok rendah.")
-//                return
-//            }
-//        }
-//
-//        // Buat teks untuk notifikasi
-//        val productNames = lowStockProducts.joinToString(", ") { it.nama ?: "Unknown" }
-//        val notificationText = if (lowStockProducts.size == 1) {
-//            "${lowStockProducts[0].nama} memiliki stok rendah (${lowStockProducts[0].stok} ≤ $minStock)"
-//        } else {
-//            "${lowStockProducts.size} produk memiliki stok rendah: $productNames"
-//        }
-//
-//        // Buat notification builder
-//        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-//            .setSmallIcon(android.R.drawable.ic_dialog_alert)
-//            .setContentTitle("⚠️ Stok Produk Rendah")
-//            .setContentText(notificationText)
-//            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//            .setAutoCancel(true)
-//            .setStyle(NotificationCompat.BigTextStyle().bigText(notificationText))
-//
-//        // Tampilkan notifikasi dengan pengecekan izin
-//        try {
-//            with(NotificationManagerCompat.from(context)) {
-//                // Gunakan NOTIFICATION_ID yang unik agar notifikasi tidak bertumpuk
-//                notify(NOTIFICATION_ID + lowStockProducts.size, builder.build())
-//            }
-//
-//            Log.d("FragmentListProduk", "Low stock notification shown for ${lowStockProducts.size} products")
-//        } catch (e: SecurityException) {
-//            Log.e("FragmentListProduk", "SecurityException when showing notification: ${e.message}")
-//            showSnackbar("Izin notifikasi diperlukan untuk peringatan stok rendah")
-//        } catch (e: Exception) {
-//            Log.e("FragmentListProduk", "Error showing notification: ${e.message}")
-//        }
-//    }
+    private fun setupFilterButton() {
+        btnFilterProduk = binding.btnFilterProduk
+
+        btnFilterProduk.setOnClickListener {
+            showFilterDialog()
+        }
+    }
+
+    private fun showFilterDialog() {
+        // Load data untuk dropdown
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Load kategori
+                val kategoris = kategoriService.getAllKategoris()
+                withContext(Dispatchers.Main) {
+                    kategoriMap.clear()
+                    kategoriList.clear()
+                    kategoriList.add("Semua Kategori")
+                    kategoris.forEach { (id, kategori) ->
+                        kategori.nama?.let { nama ->
+                            kategoriMap[nama] = id
+                            kategoriList.add(nama)
+                        }
+                    }
+                }
+
+                // Load distributor
+                val distributors = distributorService.getAllDistributors()
+                withContext(Dispatchers.Main) {
+                    distributorMap.clear()
+                    distributorList.clear()
+                    distributorList.add("Semua Distributor")
+                    distributors.forEach { (id, distributor) ->
+                        distributor.nama?.let { nama ->
+                            distributorMap[nama] = id
+                            distributorList.add(nama)
+                        }
+                    }
+
+                    // Tampilkan dialog setelah data di-load
+                    showFilterDialogUI()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Log.e("FragmentListProduk", "Error loading filter data: ${e.message}")
+                    showSnackbar("Gagal memuat data filter")
+                }
+            }
+        }
+    }
+
+    private fun showFilterDialogUI() {
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_filter_produk, null)
+
+        val spinnerKategori = dialogView.findViewById<AutoCompleteTextView>(R.id.spinnerKategori)
+        val spinnerDistributor = dialogView.findViewById<AutoCompleteTextView>(R.id.spinnerDistributor)
+        val etHargaMin = dialogView.findViewById<TextInputEditText>(R.id.etHargaMin)
+        val etHargaMax = dialogView.findViewById<TextInputEditText>(R.id.etHargaMax)
+        val btnReset = dialogView.findViewById<Button>(R.id.btnReset)
+        val btnTerapkan = dialogView.findViewById<Button>(R.id.btnTerapkan)
+
+        // Setup dropdown kategori
+        val kategoriAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            kategoriList
+        )
+        spinnerKategori.setAdapter(kategoriAdapter)
+
+        // Set selected kategori jika ada
+        selectedKategoriId?.let { selectedId ->
+            val selectedKategoriName = kategoriMap.entries.find { it.value == selectedId }?.key
+            selectedKategoriName?.let { spinnerKategori.setText(it, false) }
+        }
+
+        // Setup dropdown distributor
+        val distributorAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            distributorList
+        )
+        spinnerDistributor.setAdapter(distributorAdapter)
+
+        // Set selected distributor jika ada
+        selectedDistributorId?.let { selectedId ->
+            val selectedDistributorName = distributorMap.entries.find { it.value == selectedId }?.key
+            selectedDistributorName?.let { spinnerDistributor.setText(it, false) }
+        }
+
+        // Set harga min/max jika ada
+        hargaMin?.let { etHargaMin.setText(it.toString()) }
+        hargaMax?.let { etHargaMax.setText(it.toString()) }
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        btnReset.setOnClickListener {
+            // Reset semua filter
+            spinnerKategori.setText("Semua Kategori", false)
+            spinnerDistributor.setText("Semua Distributor", false)
+            etHargaMin.text?.clear()
+            etHargaMax.text?.clear()
+
+            selectedKategoriId = null
+            selectedDistributorId = null
+            hargaMin = null
+            hargaMax = null
+
+            // Refresh produk tanpa filter
+            filterProducts(binding.searchViewProduk.query.toString())
+            dialog.dismiss()
+        }
+
+        btnTerapkan.setOnClickListener {
+            // Apply filter
+            val selectedKategoriName = spinnerKategori.text.toString()
+            val selectedDistributorName = spinnerDistributor.text.toString()
+
+            selectedKategoriId = if (selectedKategoriName != "Semua Kategori" && selectedKategoriName.isNotEmpty()) {
+                kategoriMap[selectedKategoriName]
+            } else {
+                null
+            }
+
+            selectedDistributorId = if (selectedDistributorName != "Semua Distributor" && selectedDistributorName.isNotEmpty()) {
+                distributorMap[selectedDistributorName]
+            } else {
+                null
+            }
+
+            // Parse harga min/max
+            hargaMin = etHargaMin.text.toString().toLongOrNull()
+            hargaMax = etHargaMax.text.toString().toLongOrNull()
+
+            // Validasi harga
+            if (hargaMin != null && hargaMax != null && hargaMin!! > hargaMax!!) {
+                showSnackbar("Harga minimum tidak boleh lebih besar dari harga maksimum")
+                return@setOnClickListener
+            }
+
+            // Apply filter ke produk
+            applyFilters()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun applyFilters() {
+        val searchQuery = binding.searchViewProduk.query.toString()
+
+        // Filter berdasarkan semua kriteria
+        val filtered = productList.filter { produk ->
+            // Filter kategori
+            val kategoriMatch = selectedKategoriId?.let {
+                produk.kategori_id == it
+            } ?: true
+
+            // Filter distributor
+            val distributorMatch = selectedDistributorId?.let {
+                produk.distributor_id == it
+            } ?: true
+
+            // Filter harga
+            val hargaJual = produk.harga_jual ?: 0L
+            val minMatch = hargaMin?.let { hargaJual >= it } ?: true
+            val maxMatch = hargaMax?.let { hargaJual <= it } ?: true
+
+            // Filter pencarian
+            val searchMatch = if (searchQuery.isNotEmpty()) {
+                produk.nama?.contains(searchQuery, ignoreCase = true) == true
+            } else {
+                true
+            }
+
+            kategoriMatch && distributorMatch && minMatch && maxMatch && searchMatch
+        }
+
+        // Update UI
+        filteredList.clear()
+        filteredList.addAll(filtered)
+        productAdapter.notifyDataSetChanged()
+
+        // Tampilkan pesan jika tidak ada produk
+        binding.textEmptyProduk.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
+        binding.recyclerViewProduk.visibility = if (filteredList.isEmpty()) View.GONE else View.VISIBLE
+
+        // Tampilkan jumlah hasil filter
+        if (filteredList.isNotEmpty()) {
+            val filterInfo = buildString {
+                append("Menampilkan ${filteredList.size} produk")
+                selectedKategoriId?.let { append(" • Kategori terfilter") }
+                selectedDistributorId?.let { append(" • Distributor terfilter") }
+                if (hargaMin != null || hargaMax != null) append(" • Harga terfilter")
+            }
+            showSnackbar(filterInfo)
+        }
+    }
 
     private fun setupRecyclerView() {
         productRecyclerView = binding.recyclerViewProduk
@@ -309,6 +452,13 @@ class FragmentListProduk : Fragment() {
                     filteredList.clear()
                     productIdMap.clear()
 
+                    selectedKategoriId = null
+                    selectedDistributorId = null
+                    hargaMin = null
+                    hargaMax = null
+
+                    applyFilters()
+
                     // Tambahkan produk ke list dan simpan mapping ID
                     productsWithIds.forEach { (documentId, produk) ->
                         productList.add(produk)
@@ -329,9 +479,6 @@ class FragmentListProduk : Fragment() {
                     // Update UI state
                     binding.progressBarProduk.visibility = View.GONE
                     binding.swipeRefreshLayout.isRefreshing = false
-
-//                    // Cek stok rendah
-//                    checkLowStockProducts(productList)
 
                     // Show empty state if no data
                     if (productList.isEmpty()) {
@@ -374,11 +521,6 @@ class FragmentListProduk : Fragment() {
                 }
             }
         }
-    }
-
-    // Fungsi untuk mendapatkan nilai stok minimal
-    fun getCurrentMinStock(): Int {
-        return sharedPreferences.getInt(KEY_MIN_STOCK, DEFAULT_MIN_STOCK)
     }
 
     override fun onDestroyView() {

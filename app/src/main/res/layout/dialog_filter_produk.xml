@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Filter Produk"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Filter Kategori -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kategori"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+        <AutoCompleteTextView
+            android:id="@+id/spinnerKategori"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pilih Kategori"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Filter Distributor -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Distributor"
+        android:textSize="14sp"
+        android:layout_marginBottom="4dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+
+        <AutoCompleteTextView
+            android:id="@+id/spinnerDistributor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Pilih Distributor"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Filter Harga -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rentang Harga Jual"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHargaMin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Harga Min"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHargaMax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Harga Max"
+                android:inputType="number" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <!-- Tombol Aksi -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:layout_marginEnd="8dp"
+            style="?attr/materialButtonOutlinedStyle" />
+
+        <Button
+            android:id="@+id/btnTerapkan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Terapkan"
+            style="?attr/materialButtonStyle" />
+
+    </LinearLayout>
+
+</LinearLayout>
