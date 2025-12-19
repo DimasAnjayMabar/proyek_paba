@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Gambar Produk -->
+        <ImageView
+            android:id="@+id/imageCartProduct"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- Nama Produk -->
+        <TextView
+            android:id="@+id/textCartProductName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Nama Produk"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct"
+            app:layout_constraintStart_toEndOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toStartOf="@id/btnRemoveFromCart"/>
+
+        <!-- Harga Satuan -->
+        <TextView
+            android:id="@+id/textCartPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rp 10.000"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            app:layout_constraintTop_toTopOf="@id/textCartProductName"
+            app:layout_constraintEnd_toStartOf="@id/btnRemoveFromCart"
+            android:layout_marginEnd="8dp"/>
+
+        <!-- Kontrol Jumlah -->
+        <LinearLayout
+            android:id="@+id/layoutQuantityControl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toEndOf="@id/imageCartProduct"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct">
+
+            <!-- Tombol Kurang -->
+            <ImageButton
+                android:id="@+id/btnDecrease"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/minus"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Kurangi"/>
+
+            <!-- Jumlah -->
+            <TextView
+                android:id="@+id/textCartQuantity"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1"
+                android:textSize="16sp"
+                android:textColor="#333333"
+                android:paddingHorizontal="4dp"/>
+
+            <!-- Tombol Tambah -->
+            <ImageButton
+                android:id="@+id/btnIncrease"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/add"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Tambah"/>
+        </LinearLayout>
+
+        <!-- Subtotal -->
+        <TextView
+            android:id="@+id/textCartSubtotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rp 10.000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#E91E63"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/imageCartProduct"/>
+
+        <!-- Tombol Hapus -->
+        <ImageButton
+            android:id="@+id/btnRemoveFromCart"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Hapus"
+            app:layout_constraintTop_toTopOf="@id/imageCartProduct"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

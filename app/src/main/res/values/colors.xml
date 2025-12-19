@@ -3,4 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="appbar">#3F51B5</color>
+
+    <!-- Warna untuk SwipeRefresh -->
+    <color name="purple_500">#3F51B5</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="green_500">#4CAF50</color>
 </resources>

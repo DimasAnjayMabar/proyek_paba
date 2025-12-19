@@ -1,18 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.FragmentCashier"
-    android:background="#92DDFF">
+    tools:context=".fragments.FragmentCashier">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Cashier Fragment"
+        android:id="@+id/textHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cashier"
+        android:textSize="28sp"
+        android:textStyle="bold"
         android:gravity="center"
-        android:textSize="40sp"
-        android:textStyle="bold"/>
+        android:textColor="#000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"/>
 
-</FrameLayout>
+    <!-- Label Tambah Produk -->
+    <TextView
+        android:id="@+id/textAddProductLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Tambah Produk ke Keranjang"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#333333"
+        app:layout_constraintTop_toBottomOf="@id/textHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="16dp"/>
+
+    <!-- EditText untuk Cari Produk -->
+    <EditText
+        android:id="@+id/editTextSearchProduct"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Cari produk..."
+        android:inputType="text"
+        android:maxLines="1"
+        android:padding="16dp"
+        android:background="@android:drawable/editbox_background"
+        app:layout_constraintTop_toBottomOf="@id/textAddProductLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginHorizontal="16dp"/>
+
+    <!-- Button Tambah ke Keranjang -->
+    <Button
+        android:id="@+id/btnAddToCart"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Tambah ke Keranjang"
+        android:background="#4CAF50"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/editTextSearchProduct"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="16dp"/>
+
+    <!-- Button Checkout -->
+<!--    <Button-->
+<!--        android:id="@+id/btnCheckout"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Checkout"-->
+<!--        android:background="#2196F3"-->
+<!--        android:textColor="#FFFFFF"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textStyle="bold"-->
+<!--        android:visibility="gone"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/fabOpenCart"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:layout_marginBottom="16dp"-->
+<!--        android:layout_marginHorizontal="16dp"/>-->
+
+    <!-- FAB untuk membuka Cart -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabOpenCart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/outline_add_shopping_cart_24"
+        android:contentDescription="Open Cart"
+        app:backgroundTint="#FF5722"
+        app:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="24dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
