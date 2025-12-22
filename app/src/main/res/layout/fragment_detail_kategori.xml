@@ -4,39 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@color/background"
+    android:padding="24dp"
     tools:context=".fragments.FragmentDetailKategori">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="24dp">
+        android:orientation="vertical">
 
-        <!-- Nama Kategori -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nama Kategori"
-            android:textSize="16sp"
+            android:text="Edit Kategori"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="32dp"/>
 
-        <EditText
-            android:id="@+id/et_nama_kategori"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan nama kategori"
-            android:inputType="textCapWords"
-            android:maxLines="1"/>
+            android:hint="Nama Kategori"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <!-- Tombol Hapus dan Update -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_nama_kategori"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="32dp"
-            android:weightSum="2">
+            android:layout_marginTop="32dp">
 
             <Button
                 android:id="@+id/btn_delete_kategori"
@@ -44,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Hapus"
-                android:backgroundTint="@android:color/holo_red_dark"
+                android:backgroundTint="@color/red_error"
                 android:layout_marginEnd="8dp"/>
 
             <Button
@@ -53,9 +57,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Update"
-                android:backgroundTint="@android:color/holo_green_dark"/>
+                android:backgroundTint="@color/primary"/>
 
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>

@@ -304,13 +304,11 @@ class FragmentListProduk : Fragment() {
     private fun setupRecyclerView() {
         productRecyclerView = binding.recyclerViewProduk
 
-        // Inisialisasi adapter dengan lambda untuk navigasi ke detail
         productAdapter = ProductAdapter(filteredList) { produk ->
-            // Navigasi ke detail produk
             navigateToDetailProduk(produk)
         }
 
-        val layoutManager = GridLayoutManager(requireContext(), 3)
+        val layoutManager = GridLayoutManager(requireContext(), 2)
         productRecyclerView.layoutManager = layoutManager
         productRecyclerView.adapter = productAdapter
 
@@ -321,7 +319,8 @@ class FragmentListProduk : Fragment() {
         productRecyclerView.layoutAnimation = animation
 
         val spacingInPixels = resources.getDimensionPixelSize(R.dimen.grid_spacing)
-        productRecyclerView.addItemDecoration(GridSpacingItemDecoration(3, spacingInPixels, true))
+
+        productRecyclerView.addItemDecoration(GridSpacingItemDecoration(2, spacingInPixels, true))
 
         productRecyclerView.overScrollMode = RecyclerView.OVER_SCROLL_ALWAYS
     }

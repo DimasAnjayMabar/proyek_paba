@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     android:padding="16dp"
     tools:context=".fragments.FragmentDetailProduk">
 
@@ -13,204 +14,204 @@
         android:orientation="vertical"
         android:paddingBottom="24dp">
 
-        <!-- Nama Produk -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nama Produk"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
-
-        <EditText
-            android:id="@+id/et_nama_produk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan nama produk"
-            android:inputType="textCapWords"
-            android:maxLines="1"/>
-
-        <!-- Harga Beli -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Harga Beli"
-            android:textSize="16sp"
+            android:text="Edit Informasi Produk"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="24dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nama Produk"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_nama_produk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:hint="Harga Beli (Rp)"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <EditText
-            android:id="@+id/et_harga_beli"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_harga_beli"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan harga beli"
-            android:inputType="number"/>
-
-        <!-- Persentase Keuntungan -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Persentase Keuntungan (%)"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:hint="Persentase Keuntungan (%)"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <EditText
-            android:id="@+id/et_persentase_keuntungan"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_persentase_keuntungan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan persentase keuntungan"
-            android:inputType="numberDecimal"/>
-
-        <!-- Harga Jual (Otomatis dihitung) -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Harga Jual"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:orientation="vertical"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:background="@drawable/bg_search_view"
+            android:backgroundTint="#E3F2FD"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_harga_jual"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estimasi Harga Jual"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"/>
+
+            <TextView
+                android:id="@+id/tv_harga_jual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rp 0"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"/>
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:padding="12dp"
-            android:background="@android:drawable/editbox_background"/>
-
-        <!-- Stok -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Stok"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:hint="Stok Tersedia"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <EditText
-            android:id="@+id/et_stok"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Masukkan jumlah stok"
-            android:inputType="number"/>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_stok"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Kategori (DROPDOWN) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Kategori"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:textColor="@color/text_secondary"/>
 
-        <Spinner
-            android:id="@+id/spinner_kategori"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:background="@android:drawable/editbox_background"/>
+            android:background="@drawable/bg_search_view"
+            android:backgroundTint="@color/surface"
+            android:layout_marginTop="4dp">
+            <Spinner
+                android:id="@+id/spinner_kategori"
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
+        </FrameLayout>
 
-        <!-- Distributor (DROPDOWN) -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Distributor"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
+            android:textColor="@color/text_secondary"/>
 
-        <Spinner
-            android:id="@+id/spinner_distributor"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:background="@android:drawable/editbox_background"/>
+            android:background="@drawable/bg_search_view"
+            android:backgroundTint="@color/surface"
+            android:layout_marginTop="4dp">
+            <Spinner
+                android:id="@+id/spinner_distributor"
+                android:layout_width="match_parent"
+                android:layout_height="48dp" />
+        </FrameLayout>
 
-        <!-- Tanggal -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tanggal"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
-
-        <LinearLayout
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginTop="16dp"
+            android:hint="Tanggal Masuk"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_tanggal"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Pilih tanggal"
-                android:inputType="none"
                 android:focusable="false"
-                android:clickable="true"/>
-
-            <Button
-                android:id="@+id/btn_pick_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Pilih"/>
-        </LinearLayout>
-
-        <!-- Upload Gambar -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gambar Produk"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="4dp"/>
-
-        <ImageView
-            android:id="@+id/iv_produk"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            android:background="@android:color/darker_gray"
-            android:contentDescription="Gambar produk"
-            android:layout_marginTop="8dp"/>
+                android:clickable="true" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/btn_upload_image"
+            android:id="@+id/btn_pick_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Unggah Gambar"
-            android:layout_marginTop="8dp"/>
+            android:visibility="gone"/>
 
-        <ProgressBar
-            android:id="@+id/progress_bar_upload"
-            style="?android:attr/progressBarStyleHorizontal"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            android:max="100"
-            android:progress="0" />
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="12dp"
+            app:strokeColor="#E0E0E0"
+            app:strokeWidth="1dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
-        <!-- Tombol Hapus dan Update -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/iv_produk"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/placeholder"
+                    android:layout_marginBottom="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_upload_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ganti Gambar"
+                    app:icon="@drawable/add"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_bar_upload"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:indeterminate="true"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="32dp"
-            android:weightSum="2">
+            android:layout_marginTop="32dp">
 
             <Button
                 android:id="@+id/btn_hapus"
@@ -218,7 +219,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Hapus"
-                android:backgroundTint="@android:color/holo_red_dark"
+                app:icon="@drawable/delete"
+                android:backgroundTint="@color/red_error"
                 android:layout_marginEnd="8dp"/>
 
             <Button
@@ -226,8 +228,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Update"
-                android:backgroundTint="@android:color/holo_green_dark"/>
+                android:text="Simpan"
+                android:backgroundTint="@color/green_success"/>
 
         </LinearLayout>
 

@@ -50,7 +50,6 @@ class FragmentCashier : Fragment() {
 //        binding.btnCheckout.visibility = View.GONE
 
         // Atur hint dan enable/disable state
-        binding.editTextSearchProduct.hint = "Cari produk (ketik nama)..."
         binding.btnAddToCart.isEnabled = false
         binding.btnAddToCart.alpha = 0.5f
     }
@@ -129,7 +128,6 @@ class FragmentCashier : Fragment() {
         binding.btnAddToCart.isEnabled = false
         binding.btnAddToCart.alpha = 0.5f
         binding.btnAddToCart.text = "Tambah ke Keranjang"
-        binding.editTextSearchProduct.hint = "Cari produk (ketik nama)..."
     }
 
     private fun addProdukToCart(produkId: String, produk: DcProduk) {

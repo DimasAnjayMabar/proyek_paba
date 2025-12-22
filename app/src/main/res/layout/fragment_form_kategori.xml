@@ -4,39 +4,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@color/background"
+    android:padding="24dp"
     tools:context=".fragments.FragmentFormKategori">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="24dp">
+        android:orientation="vertical">
 
-        <!-- Nama Kategori -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nama Kategori"
-            android:textSize="16sp"
+            android:text="Tambah Kategori Baru"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="8dp"/>
 
-        <EditText
-            android:id="@+id/et_nama_kategori_new"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Masukkan nama kategori produk."
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="32dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan nama kategori"
-            android:inputType="textCapWords"
-            android:maxLines="1"/>
+            android:hint="Nama Kategori"
+            app:startIconTint="@color/primary"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <!-- Tombol Batal dan Update -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_nama_kategori_new"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:maxLines="1"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="32dp"
-            android:weightSum="2">
+            android:layout_marginTop="32dp">
 
             <Button
                 android:id="@+id/btn_cancel_kategori_new"
@@ -44,7 +57,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Batal"
-                android:backgroundTint="@android:color/holo_red_dark"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/text_secondary"
                 android:layout_marginEnd="8dp"/>
 
             <Button
@@ -52,8 +66,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Add"
-                android:backgroundTint="@android:color/holo_green_dark"/>
+                android:text="Simpan"
+                android:backgroundTint="@color/primary"
+                style="@style/Widget.MaterialComponents.Button"/>
 
         </LinearLayout>
 

@@ -4,73 +4,89 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="4dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp"
-    app:cardUseCompatPadding="true">
+    android:layout_height="290dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/surface"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp">
+        android:layout_height="match_parent"
+        android:paddingBottom="12dp">
 
-        <!-- Product Image -->
         <ImageView
             android:id="@+id/image_product"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:adjustViewBounds="true"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
             android:scaleType="centerCrop"
-            tools:src="@tools:sample/avatars" />
+            android:src="@drawable/product"
+            android:background="#F5F5F5"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="ContentDescription" />
 
-        <!-- Product Name -->
         <TextView
             android:id="@+id/text_product_name"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="12dp"
             android:ellipsize="end"
             android:maxLines="2"
-            android:text="Nama Produk"
-            android:textColor="#333333"
+            android:minLines="2"
+            tools:text="Laptop Gaming High End 2024 Series"
+            android:textColor="@color/text_primary"
             android:textSize="14sp"
-            android:textStyle="bold"
-            tools:text="Smartphone X Pro Max Ultra" />
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintTop_toBottomOf="@id/image_product"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-        <!-- Product Price -->
         <TextView
             android:id="@+id/text_product_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="12dp"
+            android:layout_marginBottom="4dp"
+            tools:text="Rp 15.000.000"
+            android:textColor="@color/primary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/layout_stok"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <LinearLayout
+            android:id="@+id/layout_stok"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Rp 4.999.000"
-            android:textColor="#E91E63"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="12dp"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:text="Stok: "
-            android:textColor="#333333"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stok:"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/text_product_stok"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:text="10 "
-            android:textColor="#333333"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/text_product_stok"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                tools:text="12"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

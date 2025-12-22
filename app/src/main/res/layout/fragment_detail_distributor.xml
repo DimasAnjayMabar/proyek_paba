@@ -4,68 +4,65 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:background="@color/background"
+    android:padding="24dp"
     tools:context=".fragments.FragmentDetailDistributor">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="24dp">
+        android:orientation="vertical">
 
-        <!-- Nama Distributor -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nama Distributor"
-            android:textSize="16sp"
+            android:text="Edit Distributor"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="24dp"/>
 
-        <EditText
-            android:id="@+id/et_nama_distributor"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan nama distributor"
-            android:inputType="textCapWords"
-            android:maxLines="1"/>
+            android:hint="Nama Distributor"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <!-- Email Distributor -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Email Distributor"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_nama_distributor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/et_email_distributor"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Masukkan email distributor"
-            android:inputType="textCapWords"
-            android:maxLines="1"/>
+            android:layout_marginTop="16dp"
+            android:hint="Email Distributor"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-        <!-- Tombol Hubungi Distributor -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_email_distributor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <Button
             android:id="@+id/btn_contact_distributor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Hubungi Distributor"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:layout_marginTop="16dp"
-            android:drawableStart="@android:drawable/ic_dialog_email"
-            android:drawablePadding="8dp"
-            android:gravity="center"/>
+            android:text="Hubungi via Email"
+            android:layout_marginTop="24dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:icon="@android:drawable/ic_dialog_email"/>
 
-        <!-- Tombol Hapus dan Update -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="32dp"
-            android:weightSum="2">
+            android:layout_marginTop="24dp">
 
             <Button
                 android:id="@+id/btn_delete_distributor"
@@ -73,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Hapus"
-                android:backgroundTint="@android:color/holo_red_dark"
+                android:backgroundTint="@color/red_error"
                 android:layout_marginEnd="8dp"/>
 
             <Button
@@ -82,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Update"
-                android:backgroundTint="@android:color/holo_green_dark"/>
+                android:backgroundTint="@color/primary"/>
 
         </LinearLayout>
 

@@ -1,65 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Stok Minimal"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="8dp"/>
-
-    <EditText
-        android:id="@+id/editTextMinStock"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:maxLength="4"
-        android:hint="Masukkan angka (1-9999)"
-        android:padding="12dp"
-        android:background="@android:drawable/editbox_background"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
-        android:id="@+id/tvInputHint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="* Notifikasi akan muncul saat stok ≤ nilai ini"
-        android:textSize="12sp"
-        android:textColor="#888888"
-        android:layout_marginBottom="16dp"/>
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="@color/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:minWidth="320dp">
 
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Batal"
-            android:backgroundTint="#F44336"
-            android:textColor="#FFFFFF"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:layout_marginEnd="8dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/settings"
+                app:tint="@color/primary"
+                android:layout_marginEnd="12dp"
+                android:contentDescription="Icon Pengaturan"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Atur Stok Minimal"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Simpan"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"/>
+            android:text="Notifikasi akan muncul jika stok produk ≤ angka ini."
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="24dp"
+            android:lineSpacingExtra="2dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Batas Stok (Contoh: 10)"
+            app:boxStrokeColor="@color/primary"
+            app:hintTextColor="@color/primary"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMinStock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="5"
+                android:textStyle="bold"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="32dp">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Batal"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:textColor="@color/text_secondary"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Simpan"
+                android:backgroundTint="@color/primary"
+                style="@style/Widget.MaterialComponents.Button"/>
+        </LinearLayout>
 
     </LinearLayout>
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

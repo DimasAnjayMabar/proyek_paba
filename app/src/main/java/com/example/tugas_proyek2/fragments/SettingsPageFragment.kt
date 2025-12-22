@@ -3,24 +3,25 @@ package com.example.tugas_proyek2.fragments
 import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.tugas_proyek2.R
+import com.google.android.material.textfield.TextInputEditText
 
 class SettingsPageFragment : Fragment() {
 
     private lateinit var tvCurrentMinStock: TextView
-    private var currentMinStock = 10 // Nilai default
+    private var currentMinStock = 10
     private lateinit var sharedPreferences: SharedPreferences
 
-    // Key untuk SharedPreferences
     companion object {
         private const val PREF_NAME = "app_settings"
         private const val KEY_MIN_STOCK = "minimal_stock"
@@ -31,98 +32,72 @@ class SettingsPageFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inisialisasi SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-
-        // Baca nilai stok minimal dari SharedPreferences
         currentMinStock = sharedPreferences.getInt(KEY_MIN_STOCK, DEFAULT_MIN_STOCK)
 
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_settings_page, container, false)
 
-        // Inisialisasi view
         tvCurrentMinStock = view.findViewById(R.id.tvCurrentMinStock)
-        val cardMinStock = view.findViewById<androidx.cardview.widget.CardView>(R.id.cardMinStock)
+        val cardMinStock = view.findViewById<View>(R.id.cardMinStock)
 
-        // Set click listener untuk card
+        val btnChangeMinStock = view.findViewById<Button>(R.id.btnChangeMinStock)
+
+        btnChangeMinStock.setOnClickListener {
+            showMinStockDialog()
+        }
+
         cardMinStock.setOnClickListener {
             showMinStockDialog()
         }
 
-        // Update tampilan dengan nilai saat ini
         updateMinStockDisplay()
 
         return view
     }
 
     private fun updateMinStockDisplay() {
-        tvCurrentMinStock.text = "Stok minimal saat ini: $currentMinStock"
+        // Tampilkan angka saja
+        tvCurrentMinStock.text = currentMinStock.toString()
     }
 
     private fun showMinStockDialog() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_min_stock, null)
 
-        val editTextMinStock = dialogView.findViewById<EditText>(R.id.editTextMinStock)
+        val etMinStock = dialogView.findViewById<TextInputEditText>(R.id.etMinStock)
         val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
         val btnSave = dialogView.findViewById<Button>(R.id.btnSave)
 
-        // Set nilai saat ini ke EditText
-        editTextMinStock.setText(currentMinStock.toString())
+        etMinStock.setText(currentMinStock.toString())
 
-        // Buat dialog
         val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Atur Stok Minimal")
-            .setMessage("Masukkan jumlah stok minimal untuk notifikasi:")
             .setView(dialogView)
             .create()
 
-        // Setup button listeners
+        // Background transparan agar sudut rounded terlihat
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
         btnCancel.setOnClickListener {
             dialog.dismiss()
         }
 
         btnSave.setOnClickListener {
-            val input = editTextMinStock.text.toString().trim()
+            val input = etMinStock.text.toString().trim()
 
             if (input.isNotEmpty()) {
                 try {
                     val newValue = input.toInt()
-                    if (newValue > 0 && newValue <= 9999) { // Batas maksimal 9999
-                        // Simpan ke SharedPreferences
+                    if (newValue > 0 && newValue <= 9999) {
                         saveMinStockToPrefs(newValue)
-
-                        Toast.makeText(
-                            requireContext(),
-                            "Stok minimal berhasil diubah menjadi $newValue",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(requireContext(), "Stok minimal diperbarui", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
-                    } else if (newValue <= 0) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Masukkan angka lebih besar dari 0",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Maksimal angka adalah 9999",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        etMinStock.error = "Angka harus 1 - 9999"
                     }
                 } catch (e: NumberFormatException) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Masukkan angka yang valid",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    etMinStock.error = "Input tidak valid"
                 }
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Masukkan jumlah stok minimal",
-                    Toast.LENGTH_SHORT
-                ).show()
+                etMinStock.error = "Wajib diisi"
             }
         }
 
@@ -132,14 +107,9 @@ class SettingsPageFragment : Fragment() {
     private fun saveMinStockToPrefs(value: Int) {
         with(sharedPreferences.edit()) {
             putInt(KEY_MIN_STOCK, value)
-            apply() // Async save, gunakan commit() jika perlu synchronous
+            apply()
         }
         currentMinStock = value
         updateMinStockDisplay()
-    }
-
-    // Fungsi untuk mendapatkan nilai stok minimal dari luar fragment
-    fun getCurrentMinStock(): Int {
-        return sharedPreferences.getInt(KEY_MIN_STOCK, DEFAULT_MIN_STOCK)
     }
 }

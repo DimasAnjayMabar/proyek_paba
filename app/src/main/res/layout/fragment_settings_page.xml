@@ -5,96 +5,130 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.SettingsPageFragment"
-    android:background="#F5F5F5">
+    android:background="@color/background">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:padding="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Header -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Pengaturan"
-                android:textSize="28sp"
+                android:text="Pengaturan Aplikasi"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="#333333"
+                android:textColor="@color/text_primary"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Card untuk Stok Minimal -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardMinStock"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="#FFFFFF">
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/surface"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Atur Stok Minimal"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Setel batas stok minimal untuk mendapatkan notifikasi"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginTop="4dp" />
+                    android:padding="20dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="12dp"
                         android:gravity="center_vertical">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/settings"
+                            app:tint="@color/primary"
+                            android:layout_marginEnd="12dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Notifikasi Stok Menipis"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Notifikasi muncul jika stok ≤ batas ini."
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="8dp"
+                        android:lineSpacingExtra="4dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F0F0F0"
+                        android:layout_marginVertical="16dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Batas Minimal:"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="14sp"/>
 
                         <TextView
                             android:id="@+id/tvCurrentMinStock"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Stok minimal saat ini: 10"
-                            android:textSize="16sp"
-                            android:textColor="#2196F3" />
+                            android:layout_marginStart="12dp"
+                            android:text="10"
+                            android:textStyle="bold"
+                            android:textSize="24sp"
+                            android:textColor="@color/primary" />
 
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_edit"
-                            app:tint="#666666" />
+                        <Button
+                            android:id="@+id/btnChangeMinStock"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ubah"
+                            style="@style/Widget.MaterialComponents.Button.TextButton"
+                            android:textColor="@color/secondary"
+                            android:minWidth="0dp"
+                            android:paddingHorizontal="12dp"/>
                     </LinearLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Informasi tambahan -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fitur notifikasi akan diaktifkan setelah stok mencapai batas minimal yang ditetapkan."
+                android:text="Versi Aplikasi 1.0.0"
+                android:gravity="center"
                 android:textSize="12sp"
-                android:textColor="#888888"
-                android:layout_marginTop="8dp"
-                android:lineSpacingExtra="4dp"/>
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="32dp"/>
 
         </LinearLayout>
     </ScrollView>
-
 </FrameLayout>
