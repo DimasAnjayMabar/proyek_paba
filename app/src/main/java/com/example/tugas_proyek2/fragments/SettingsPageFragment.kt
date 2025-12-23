@@ -111,5 +111,7 @@ class SettingsPageFragment : Fragment() {
         }
         currentMinStock = value
         updateMinStockDisplay()
+
+        (activity as? com.example.tugas_proyek2.MainActivity)?.checkLowStockGlobally()
     }
 }

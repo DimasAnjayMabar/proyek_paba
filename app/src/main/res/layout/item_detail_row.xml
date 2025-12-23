@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="6dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvRowNama"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nama Produk"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tvRowHargaQty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2 x Rp 5.000"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvRowSubtotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Rp 10.000"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="14sp"/>
+
+</LinearLayout>

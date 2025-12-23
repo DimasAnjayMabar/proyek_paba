@@ -8,14 +8,17 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.tugas_proyek2.R
 import com.example.tugas_proyek2.data_class.DcCart
+import com.example.tugas_proyek2.data_class.DcItemTransaksi
 import com.example.tugas_proyek2.data_class.DcProduk
+import com.example.tugas_proyek2.data_class.DcTransaksi
 import com.example.tugas_proyek2.databinding.FragmentCartBinding
 import com.example.tugas_proyek2.service_layers.CartService
 import com.example.tugas_proyek2.services.ProdukService
+import com.example.tugas_proyek2.services.TransaksiService
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Timestamp
 import kotlinx.coroutines.launch
 
 class CartFragment : Fragment() {
@@ -25,11 +28,10 @@ class CartFragment : Fragment() {
 
     private val cartService = CartService()
     private val produkService = ProdukService()
+    private val transaksiService = TransaksiService() // Service baru
 
     private lateinit var cartAdapter: CartAdapter
     private val cartItemsWithDetails = mutableListOf<CartItemWithDetails>()
-
-    // Flag untuk mencegah multiple loading
     private var isLoading = false
 
     override fun onCreateView(
@@ -42,7 +44,6 @@ class CartFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         setupSwipeRefresh()
         setupListeners()
@@ -57,21 +58,17 @@ class CartFragment : Fragment() {
                 "remove" -> removeFromCart(cartId)
             }
         }
-
         binding.recyclerViewCart.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = cartAdapter
-            setHasFixedSize(true) // Tambahkan ini untuk performance
+            setHasFixedSize(true)
         }
     }
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshCart.setColorSchemeResources(
-            R.color.purple_500,
-            R.color.blue_500,
-            R.color.green_500
+            R.color.purple_500, R.color.blue_500, R.color.green_500
         )
-
         binding.swipeRefreshCart.setOnRefreshListener {
             loadCartData(showLoading = false)
         }
@@ -86,21 +83,13 @@ class CartFragment : Fragment() {
     }
 
     private fun loadCartData(showLoading: Boolean = true) {
-        // Cegah multiple loading
         if (isLoading) return
-
         isLoading = true
-
-        if (showLoading) {
-            binding.swipeRefreshCart.isRefreshing = true
-        }
+        if (showLoading) binding.swipeRefreshCart.isRefreshing = true
 
         lifecycleScope.launch {
             try {
-                // CLEAR LIST SEBELUM LOAD DATA BARU
                 cartItemsWithDetails.clear()
-
-                // Get semua item cart dengan ID
                 val cartItemsMap = cartService.getAllCartItemsWithIds()
 
                 if (cartItemsMap.isEmpty()) {
@@ -108,16 +97,11 @@ class CartFragment : Fragment() {
                     return@launch
                 }
 
-                // Untuk setiap cart item, get detail produk
                 for ((cartId, cartItem) in cartItemsMap) {
                     val produk = produkService.getProductById(cartItem.produk_id)
                     if (produk != null) {
                         cartItemsWithDetails.add(
-                            CartItemWithDetails(
-                                cartId = cartId,
-                                cartItem = cartItem,
-                                produk = produk
-                            )
+                            CartItemWithDetails(cartId, cartItem, produk)
                         )
                     }
                 }
@@ -128,7 +112,6 @@ class CartFragment : Fragment() {
                     showCartItems()
                     updateGrandTotal()
                 }
-
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 showEmptyCart()
@@ -139,11 +122,8 @@ class CartFragment : Fragment() {
         }
     }
 
-    // Fungsi refresh yang lebih aman (gunakan ini di onResume)
     private fun safeRefreshCart() {
-        if (!isLoading) {
-            loadCartData(showLoading = false)
-        }
+        if (!isLoading) loadCartData(showLoading = false)
     }
 
     private fun updateQuantity(cartId: String, newQuantity: Long) {
@@ -153,13 +133,8 @@ class CartFragment : Fragment() {
                     removeFromCart(cartId)
                 } else {
                     val success = cartService.updateCartItemQuantity(cartId, newQuantity)
-
-                    if (success) {
-                        // Gunakan safeRefreshCart bukan loadCartData langsung
-                        safeRefreshCart()
-                    } else {
-                        Toast.makeText(requireContext(), "Gagal mengupdate jumlah", Toast.LENGTH_SHORT).show()
-                    }
+                    if (success) safeRefreshCart()
+                    else Toast.makeText(requireContext(), "Gagal update jumlah", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -171,25 +146,15 @@ class CartFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 val success = cartService.removeFromCart(cartId)
-
                 if (success) {
-                    // Hapus dari list lokal
                     val index = cartItemsWithDetails.indexOfFirst { it.cartId == cartId }
                     if (index != -1) {
                         cartItemsWithDetails.removeAt(index)
                         cartAdapter.notifyItemRemoved(index)
                     }
-
-                    // Update UI
-                    if (cartItemsWithDetails.isEmpty()) {
-                        showEmptyCart()
-                    } else {
-                        updateGrandTotal()
-                    }
-
-                    Toast.makeText(requireContext(), "Produk dihapus dari keranjang", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), "Gagal menghapus produk", Toast.LENGTH_SHORT).show()
+                    if (cartItemsWithDetails.isEmpty()) showEmptyCart()
+                    else updateGrandTotal()
+                    Toast.makeText(requireContext(), "Produk dihapus", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -199,18 +164,17 @@ class CartFragment : Fragment() {
 
     private fun showCheckoutConfirmationDialog() {
         val grandTotal = calculateGrandTotal()
-
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Checkout")
             .setMessage("""
-                Anda akan melakukan checkout dengan total:
+                Konfirmasi Pembelian:
                 
-                ${cartItemsWithDetails.size} produk
-                Grand Total: Rp ${formatRupiah(grandTotal)}
+                ${cartItemsWithDetails.size} jenis produk
+                Total Biaya: Rp ${formatRupiah(grandTotal)}
                 
-                Apakah Anda yakin ingin melanjutkan?
+                Lanjutkan proses pembayaran?
             """.trimIndent())
-            .setPositiveButton("Ya, Checkout") { dialog, _ ->
+            .setPositiveButton("Bayar") { dialog, _ ->
                 dialog.dismiss()
                 processCheckout()
             }
@@ -223,32 +187,60 @@ class CartFragment : Fragment() {
             try {
                 binding.swipeRefreshCart.isRefreshing = true
 
-                // 1. Update stok untuk setiap produk
+                // === PERSIAPAN DATA HISTORY ===
+                val grandTotal = calculateGrandTotal()
+                val detailItems = cartItemsWithDetails.map { item ->
+                    // Casting aman (Safe Cast)
+                    val hargaSatuan = item.produk.harga_jual?.toString()?.toLongOrNull() ?: 0L
+                    val jumlah = item.cartItem.jumlah?.toString()?.toIntOrNull() ?: 0
+                    val subtotal = item.cartItem.subtotal?.toString()?.toLongOrNull() ?: 0L
+
+                    DcItemTransaksi(
+                        id_produk = item.cartItem.produk_id,
+                        nama_produk = item.produk.nama,
+                        harga_satuan = hargaSatuan,
+                        jumlah = jumlah,
+                        subtotal = subtotal
+                    )
+                }
+
+                val transaksiBaru = DcTransaksi(
+                    timestamp = Timestamp.now(),
+                    total_harga = grandTotal,
+                    items = detailItems
+                )
+                // ==============================
+
+                // 2. Update stok
                 val updateStockJobs = cartItemsWithDetails.map { item ->
                     launch {
                         val currentProduk = produkService.getProductById(item.cartItem.produk_id)
                         if (currentProduk != null) {
-                            val newStock = (currentProduk.stok ?: 0L) - item.cartItem.jumlah!!
+                            val stokSekarang = currentProduk.stok?.toString()?.toLongOrNull() ?: 0L
+                            val jumlahBeli = item.cartItem.jumlah ?: 0L
+
+                            val newStock = stokSekarang - jumlahBeli
                             val updatedProduk = currentProduk.copy(stok = newStock)
                             produkService.updateProduct(item.cartItem.produk_id, updatedProduk)
                         }
                     }
                 }
-
                 updateStockJobs.forEach { it.join() }
 
-                // 2. Kosongkan cart
-                val success = cartService.clearCart()
+                // 3. SIMPAN KE FIREBASE (Ini yang akan membuat tabel 'transaksi')
+                val isSaved = transaksiService.addTransaksi(transaksiBaru)
 
-                if (success) {
-                    // CLEAR LIST SETELAH CHECKOUT
-                    cartItemsWithDetails.clear()
-                    cartAdapter.notifyDataSetChanged()
-                    showEmptyCart()
-
-                    Toast.makeText(requireContext(), "Checkout berhasil!", Toast.LENGTH_LONG).show()
+                if (isSaved) {
+                    // 4. Kosongkan Cart hanya jika simpan history berhasil
+                    val clearSuccess = cartService.clearCart()
+                    if (clearSuccess) {
+                        cartItemsWithDetails.clear()
+                        cartAdapter.notifyDataSetChanged()
+                        showEmptyCart()
+                        Toast.makeText(requireContext(), "Checkout Berhasil!", Toast.LENGTH_LONG).show()
+                    }
                 } else {
-                    Toast.makeText(requireContext(), "Gagal checkout", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Gagal menyimpan riwayat transaksi", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
@@ -259,54 +251,26 @@ class CartFragment : Fragment() {
         }
     }
 
-    private fun calculateGrandTotal(): Long {
-        return cartItemsWithDetails.sumOf { it.cartItem.subtotal ?: 0L }
-    }
-
-    private fun updateGrandTotal() {
-        val grandTotal = calculateGrandTotal()
-        binding.textGrandTotal.text = "Rp ${formatRupiah(grandTotal)}"
-    }
-
+    private fun calculateGrandTotal(): Long = cartItemsWithDetails.sumOf { it.cartItem.subtotal ?: 0L }
+    private fun updateGrandTotal() { binding.textGrandTotal.text = "Rp ${formatRupiah(calculateGrandTotal())}" }
     private fun showEmptyCart() {
         binding.swipeRefreshCart.visibility = View.GONE
         binding.textEmptyCart.visibility = View.VISIBLE
         binding.layoutCartFooter.visibility = View.GONE
         binding.btnCheckout.visibility = View.GONE
     }
-
     private fun showCartItems() {
         binding.swipeRefreshCart.visibility = View.VISIBLE
         binding.textEmptyCart.visibility = View.GONE
         binding.layoutCartFooter.visibility = View.VISIBLE
         binding.btnCheckout.visibility = View.VISIBLE
-
-        // Gunakan notifyDataSetChanged, bukan notifyItemRangeChanged
         cartAdapter.notifyDataSetChanged()
     }
+    private fun formatRupiah(amount: Long): String = String.format("%,d", amount).replace(",", ".")
 
-    private fun formatRupiah(amount: Long): String {
-        return String.format("%,d", amount).replace(",", ".")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Gunakan safeRefreshCart untuk menghindari duplicate
-        safeRefreshCart()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // Reset loading flag
-        isLoading = false
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        // Clear list saat fragment dihancurkan
-        cartItemsWithDetails.clear()
-        _binding = null
-    }
+    override fun onResume() { super.onResume(); safeRefreshCart() }
+    override fun onPause() { super.onPause(); isLoading = false }
+    override fun onDestroyView() { super.onDestroyView(); cartItemsWithDetails.clear(); _binding = null }
 
     data class CartItemWithDetails(
         val cartId: String,
