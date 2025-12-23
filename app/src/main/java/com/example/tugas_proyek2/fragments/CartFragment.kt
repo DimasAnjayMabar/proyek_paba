@@ -1,6 +1,7 @@
 package com.example.tugas_proyek2.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -162,35 +163,108 @@ class CartFragment : Fragment() {
         }
     }
 
+    private suspend fun validateStockBeforeCheckout(): Boolean {
+        return try {
+            var isValid = true
+            val errorMessages = mutableListOf<String>()
+
+            for (item in cartItemsWithDetails) {
+                val produk = produkService.getProductById(item.cartItem.produk_id)
+                if (produk != null) {
+                    val stokTersedia = produk.stok ?: 0L
+                    val jumlahDipesan = item.cartItem.jumlah ?: 0L
+
+                    if (jumlahDipesan > stokTersedia) {
+                        isValid = false
+                        errorMessages.add(
+                            "${item.produk.nama ?: "Produk"}: " +
+                                    "Stok tersedia: $stokTersedia, " +
+                                    "Dipesan: $jumlahDipesan"
+                        )
+                    }
+                } else {
+                    isValid = false
+                    errorMessages.add("Produk ${item.produk.nama} tidak ditemukan")
+                }
+            }
+
+            if (!isValid) {
+                // Tampilkan dialog error
+                showStockValidationErrorDialog(errorMessages)
+            }
+
+            isValid
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Error validasi stok: ${e.message}", Toast.LENGTH_SHORT).show()
+            false
+        }
+    }
+
+    private fun showStockValidationErrorDialog(errorMessages: List<String>) {
+        val errorMessage = StringBuilder()
+        errorMessage.append("Stok tidak mencukupi untuk produk berikut:\n\n")
+
+        errorMessages.forEachIndexed { index, message ->
+            errorMessage.append("${index + 1}. $message\n")
+        }
+
+        errorMessage.append("\nSilahkan kurangi jumlah pesanan atau hapus produk dari keranjang.")
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Stok Tidak Cukup")
+            .setMessage(errorMessage.toString())
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
     private fun showCheckoutConfirmationDialog() {
         val grandTotal = calculateGrandTotal()
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Checkout")
             .setMessage("""
-                Konfirmasi Pembelian:
-                
-                ${cartItemsWithDetails.size} jenis produk
-                Total Biaya: Rp ${formatRupiah(grandTotal)}
-                
-                Lanjutkan proses pembayaran?
-            """.trimIndent())
+            Konfirmasi Pembelian:
+            
+            ${cartItemsWithDetails.size} jenis produk
+            Total Biaya: Rp ${formatRupiah(grandTotal)}
+            
+            Lanjutkan proses pembayaran?
+        """.trimIndent())
             .setPositiveButton("Bayar") { dialog, _ ->
                 dialog.dismiss()
-                processCheckout()
+                // Panggil validasi stok sebelum checkout
+                validateStockAndCheckout()
             }
             .setNegativeButton("Batal", null)
             .show()
     }
 
-    private fun processCheckout() {
+    private fun validateStockAndCheckout() {
         lifecycleScope.launch {
             try {
                 binding.swipeRefreshCart.isRefreshing = true
 
+                // 1. Validasi stok sebelum melanjutkan
+                val isStockValid = validateStockBeforeCheckout()
+                if (!isStockValid) {
+                    binding.swipeRefreshCart.isRefreshing = false
+                    return@launch
+                }
+
+                // 2. Jika stok valid, lanjutkan proses checkout
+                processCheckoutAfterValidation()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                binding.swipeRefreshCart.isRefreshing = false
+            }
+        }
+    }
+
+    private fun processCheckoutAfterValidation() {
+        lifecycleScope.launch {
+            try {
                 // === PERSIAPAN DATA HISTORY ===
                 val grandTotal = calculateGrandTotal()
                 val detailItems = cartItemsWithDetails.map { item ->
-                    // Casting aman (Safe Cast)
                     val hargaSatuan = item.produk.harga_jual?.toString()?.toLongOrNull() ?: 0L
                     val jumlah = item.cartItem.jumlah?.toString()?.toIntOrNull() ?: 0
                     val subtotal = item.cartItem.subtotal?.toString()?.toLongOrNull() ?: 0L
@@ -211,7 +285,7 @@ class CartFragment : Fragment() {
                 )
                 // ==============================
 
-                // 2. Update stok
+                // 2. Update stok (sekarang stok sudah pasti cukup)
                 val updateStockJobs = cartItemsWithDetails.map { item ->
                     launch {
                         val currentProduk = produkService.getProductById(item.cartItem.produk_id)
@@ -220,14 +294,19 @@ class CartFragment : Fragment() {
                             val jumlahBeli = item.cartItem.jumlah ?: 0L
 
                             val newStock = stokSekarang - jumlahBeli
-                            val updatedProduk = currentProduk.copy(stok = newStock)
-                            produkService.updateProduct(item.cartItem.produk_id, updatedProduk)
+                            // Validasi tambahan untuk memastikan stok tidak negatif
+                            if (newStock >= 0) {
+                                val updatedProduk = currentProduk.copy(stok = newStock)
+                                produkService.updateProduct(item.cartItem.produk_id, updatedProduk)
+                            } else {
+                                Log.e("Checkout", "Stok menjadi negatif untuk produk: ${item.produk.nama}")
+                            }
                         }
                     }
                 }
                 updateStockJobs.forEach { it.join() }
 
-                // 3. SIMPAN KE FIREBASE (Ini yang akan membuat tabel 'transaksi')
+                // 3. SIMPAN KE FIREBASE
                 val isSaved = transaksiService.addTransaksi(transaksiBaru)
 
                 if (isSaved) {
